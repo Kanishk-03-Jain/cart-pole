@@ -47,7 +47,7 @@ inline void watch(Strategy &s, unsigned seed, int fps = 50) {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        DrawText(TextFormat("%s   episode %d   step %d", windowTitle, episode, steps), 10, 10, 20, RAYWHITE);
+        DrawText(TextFormat("%s   episode %d   step %d", windowTitle.c_str(), episode, steps), 10, 10, 20, RAYWHITE);
         drawTrack();
         drawCartPole(res.state);
         

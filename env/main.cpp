@@ -1,6 +1,4 @@
-#include "cartpole.h"
 #include "renderer.h"
-#include "strategy.h"
 #include "evaluator.h"
 #include "strategies/random_strategy.h"
 
