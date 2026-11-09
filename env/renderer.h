@@ -1,6 +1,7 @@
 #pragma once
 #include "raylib.h"
 #include "cartpole.h"
+#include "strategy.h"
 
 const int ROPE_Y = 500;
 const int SCREEN_HEIGHT = 600, SCREEN_WIDTH = 800;
@@ -24,4 +25,41 @@ inline void drawTrack() {
     DrawLine(SCREEN_WIDTH/2 - X_THRESHOLD * SCALE, ROPE_Y, SCREEN_WIDTH/2 - X_THRESHOLD * SCALE, ROPE_Y - 100, WHITE);
     DrawLine(SCREEN_WIDTH/2 + X_THRESHOLD * SCALE, ROPE_Y, SCREEN_WIDTH/2 + X_THRESHOLD * SCALE, ROPE_Y - 100, WHITE);
 
+}
+
+inline void watch(Strategy &s, unsigned seed, int fps = 50) {
+    CartPole env(seed);
+    const std::string windowTitle = "Strategy: " + s.name();
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, windowTitle.c_str());
+    SetTargetFPS(fps);
+
+    int episode = 1;
+    int steps = 1;
+
+    while (!WindowShouldClose()) {
+
+        StepResult res = env.step(
+            s.act(
+                env.getState()
+            )
+        );
+        
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        DrawText(TextFormat("%s   episode %d   step %d", windowTitle, episode, steps), 10, 10, 20, RAYWHITE);
+        drawTrack();
+        drawCartPole(res.state);
+        
+        EndDrawing();
+
+        if (res.truncated || res.terminated) {
+            env.reset();
+            steps = 1;
+            episode++;
+        } else {
+            steps++;
+        }
+    }
+    CloseWindow();
 }
