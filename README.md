@@ -53,7 +53,8 @@ env/
 ├── cartpole.h          environment: physics constants, State, StepResult, CartPole
 ├── strategy.h          Strategy base class (the interface every strategy implements)
 ├── strategies/         strategy implementations
-│   └── random_strategy.h
+│   └── random.h
+|    ...
 ├── evaluator.h         Evaluator, EvalReport, printReport (no raylib)
 ├── observer.h          EpisodeObserver: hooks called during a run (no raylib)
 ├── renderer.h          raylib drawing, the Observer window and watch()
