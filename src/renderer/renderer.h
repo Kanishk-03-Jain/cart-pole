@@ -1,8 +1,8 @@
 #pragma once
 #include "raylib.h"
-#include "cartpole.h"
-#include "strategy.h"
-#include "observer.h"
+#include "env/cartpole.h"
+#include "strategies/strategy.h"
+#include "evaluation/observer.h"
 
 const int ROPE_Y = 500;
 const int SCREEN_HEIGHT = 600, SCREEN_WIDTH = 800;
@@ -67,10 +67,9 @@ inline void watch(Strategy &s, unsigned seed, int fps = 50) {
 
 class Observer : public EpisodeObserver {
     bool draw = true;
-    int fps;
 
 public:
-    explicit Observer(int fps=50) : fps(fps) {
+    explicit Observer(int fps=50) {
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Observer");
         SetTargetFPS(fps);
     }

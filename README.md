@@ -22,44 +22,51 @@ On macOS:
 brew install raylib
 ```
 
-On Linux, install raylib from your package manager or build it from source. Depending on how it's installed, you may need to add raylib's system libraries (for example `-lGL -lm -lpthread -ldl -lrt -lX11`) to `LDLIBS` in `env/Makefile`.
+On Linux, install raylib from your package manager or build it from source. Depending on how it's installed, you may need to add raylib's system libraries (for example `-lGL -lm -lpthread -ldl -lrt -lX11`) to `LDLIBS` in the `Makefile`.
 
 ## Build and run
 
+Run these from the repository root:
+
 ```sh
-cd env
-make run
+make run      # build (only if a file changed), then run
+make build    # build only; the program is written to build/main
+make clean    # delete the build/ folder
 ```
 
-`make run` builds the program (only if a file changed) and runs it. `make clean` removes the compiled program.
-
-The current `main.cpp` evaluates the random strategy over 1000 episodes while drawing them in a window. Close the window to skip the animation; the evaluation keeps running and prints its report:
+The current `src/main.cpp` evaluates the lean strategy over 1000 episodes while drawing them in a window. Close the window to skip the animation; the evaluation keeps running and prints its report:
 
 ```
-Random
-Mean: 21.998
-Median: 19
-Std: 11.8321
-Min: 8
-Max: 105
+Lean
+Mean: 42.62
+Median: 41
+Std: 8.72822
+Min: 25
+Max: 71
 Success: 0
-StdErr: 0.374163
+StdErr: 0.27601
 ```
 
 ## Project structure
 
 ```
-env/
-├── cartpole.h          environment: physics constants, State, StepResult, CartPole
-├── strategy.h          Strategy base class (the interface every strategy implements)
-├── strategies/         strategy implementations
-│   └── random.h
-|    ...
-├── evaluator.h         Evaluator, EvalReport, printReport (no raylib)
-├── observer.h          EpisodeObserver: hooks called during a run (no raylib)
-├── renderer.h          raylib drawing, the Observer window and watch()
-├── main.cpp            entry point
-└── Makefile
+.
+├── Makefile
+├── README.md
+└── src/
+    ├── main.cpp              entry point
+    ├── env/
+    │   └── cartpole.h        environment: physics constants, State, StepResult, CartPole
+    ├── strategies/
+    │   ├── strategy.h        Strategy base class (the interface every strategy implements)
+    │   ├── random.h          RandomStrategy
+    │   └── lean.h            LeanStrategy
+    |    ...
+    ├── evaluation/
+    │   ├── evaluator.h       Evaluator, EvalReport, printReport (no raylib)
+    │   └── observer.h        EpisodeObserver: hooks called during a run (no raylib)
+    └── renderer/
+        └── renderer.h        raylib drawing, the Observer window and watch()
 ```
 
 Only `renderer.h` and `main.cpp` use raylib. The environment, strategies and evaluator are plain C++, so they work without a display.
@@ -76,7 +83,7 @@ Only `renderer.h` and `main.cpp` use raylib. The environment, strategies and eva
 | **Start state** | each of the four values drawn uniformly from [-0.05, 0.05] |
 | **Time step** | 0.02 s, explicit Euler integration |
 
-The derivation of the equations of motion is written out as a comment in `cartpole.h`.
+The derivation of the equations of motion is written out as a comment in `src/env/cartpole.h`.
 
 ```cpp
 CartPole env(42);                    // seed for the start states
@@ -88,24 +95,26 @@ env.reset();                         // new random start state
 
 ## Writing a strategy
 
-Create a header in `env/strategies/`. For example, push in the direction the pole is leaning:
+Create a header in `src/strategies/`. For example, `src/strategies/lean.h` pushes in the direction the pole is leaning:
 
 ```cpp
 #pragma once
-#include "../strategy.h"
+#include "strategies/strategy.h"
 
 class LeanStrategy : public Strategy {
 public:
-    int act(const State& s) override { return s.theta > 0 ? 1 : 0; }
+    int act(const State &s) override {
+        return s.theta > 0 ? 1 : 0;
+    }
     std::string name() const override { return "Lean"; }
 };
 ```
 
-Then evaluate it in `main.cpp`:
+Then evaluate it in `src/main.cpp`:
 
 ```cpp
-#include "evaluator.h"
-#include "strategies/lean_strategy.h"
+#include "evaluation/evaluator.h"
+#include "strategies/lean.h"
 
 int main() {
     LeanStrategy lean;
@@ -114,11 +123,11 @@ int main() {
 }
 ```
 
-The Makefile picks up any header in `strategies/` automatically.
+You only need to include the new header in `main.cpp`. The Makefile already watches every header in a `src/` subfolder, so editing any of them triggers a rebuild.
 
 ## Watching a strategy
 
-Pass an `Observer` to the evaluator to draw every step:
+Pass an `Observer` (from `renderer/renderer.h`) to the evaluator to draw every step:
 
 ```cpp
 Observer window(50);                     // 50 FPS = real time; lower is slow motion
@@ -128,7 +137,7 @@ printReport(evaluator.evaluate(strategy));
 
 At 50 FPS, many episodes take a long time to watch, so use a small episode count for watching and a separate evaluator without an observer for full evaluations. Watching doesn't change the results: the observer only reads the state.
 
-`watch(strategy, seed, fps)` in `renderer.h` plays episodes endlessly until you close the window.
+`watch(strategy, seed, fps)` in `src/renderer/renderer.h` plays episodes endlessly until you close the window.
 
 ## Reproducibility
 
@@ -138,7 +147,7 @@ At 50 FPS, many episodes take a long time to watch, so use a small episode count
 
 ## Reference results
 
-1000 episodes, environment seed 42. These are simple rules you can write in one line of `act()`; only the random strategy is included in the repo.
+1000 episodes, environment seed 42. These are simple rules you can write in one line of `act()`; the random and lean strategies are included in the repo.
 
 | Strategy | Rule: push right if… | Mean return | Reaches 500 |
 |---|---|---|---|
@@ -153,4 +162,3 @@ Gymnasium considers `CartPole-v1` solved at an average return of 475 over 100 ep
 - More built-in strategies, including a linear strategy with configurable weights
 - Evaluator: record why each episode ended (pole angle vs. cart position) and how steady the control was
 - Learning: hill climbing over linear weights, then Q-learning
-- Python bindings (pybind11) with a Gymnasium-compatible wrapper, validated step by step against `CartPole-v1`

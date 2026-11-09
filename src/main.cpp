@@ -1,5 +1,5 @@
-#include "renderer.h"
-#include "evaluator.h"
+#include "renderer/renderer.h"
+#include "evaluation/evaluator.h"
 #include "strategies/random.h"
 #include "strategies/lean.h"
 

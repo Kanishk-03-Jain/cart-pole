@@ -1,5 +1,5 @@
 #pragma once
-#include "../strategy.h"
+#include "strategies/strategy.h"
 
 class RandomStrategy : public Strategy {
     std::mt19937 rng;

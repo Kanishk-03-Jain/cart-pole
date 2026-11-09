@@ -2,9 +2,9 @@
 #include <string>
 #include <iostream>
 #include <cmath>
-#include "cartpole.h"
-#include "strategy.h"
-#include "observer.h"
+#include "env/cartpole.h"
+#include "strategies/strategy.h"
+#include "evaluation/observer.h"
 #include <vector>
 #include <numeric>
 #include <algorithm>

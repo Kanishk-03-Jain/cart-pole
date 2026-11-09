@@ -1,5 +1,5 @@
 #pragma once
-#include "strategy.h"
+#include "strategies/strategy.h"
 
 class LeanStrategy : public Strategy {
 public:
