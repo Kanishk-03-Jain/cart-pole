@@ -4,6 +4,7 @@
 #include <cmath>
 #include "cartpole.h"
 #include "strategy.h"
+#include "observer.h"
 #include <vector>
 #include <numeric>
 #include <algorithm>
@@ -19,9 +20,10 @@ struct EvalReport {
 class Evaluator {
     int numEpisodes;
     unsigned envSeed;
+    EpisodeObserver *observer;
 
 public:
-    Evaluator(int numEpisodes, unsigned envSeed) : numEpisodes(numEpisodes), envSeed(envSeed) {}
+    Evaluator(int numEpisodes, unsigned envSeed, EpisodeObserver *obs = nullptr) : numEpisodes(numEpisodes), envSeed(envSeed), observer(obs) {}
 
     EvalReport evaluate(Strategy &strategy) const {
         if (numEpisodes <= 0) {
@@ -32,20 +34,27 @@ public:
         std::vector<int> returns(numEpisodes);
 
         int success = 0;
-        for (int episode = 0; episode < numEpisodes; episode++) {
+        for (int episode = 1; episode <= numEpisodes; episode++) {
+            if (observer) observer->onEpisodeStart(episode);
+
             State state = env.getState();
             StepResult result;
             int r = 0;
+            int step = 0;
             do {
                 int action = strategy.act(state);
                 result = env.step(action);
                 state = result.state;
                 r += result.reward;
+                step++;
+
+                if (observer) observer->onStep(state, episode, step);
             } while (!result.terminated && !result.truncated);
 
             if (!result.terminated) success++;
 
-            returns[episode] = r;
+            returns[episode-1] = r;
+            if (observer) observer->onEpisodeEnd(episode, r);
             env.reset();
         }
 

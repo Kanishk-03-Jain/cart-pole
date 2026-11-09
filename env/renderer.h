@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "cartpole.h"
 #include "strategy.h"
+#include "observer.h"
 
 const int ROPE_Y = 500;
 const int SCREEN_HEIGHT = 600, SCREEN_WIDTH = 800;
@@ -63,3 +64,34 @@ inline void watch(Strategy &s, unsigned seed, int fps = 50) {
     }
     CloseWindow();
 }
+
+class Observer : public EpisodeObserver {
+    bool draw = true;
+    int fps;
+
+public:
+    explicit Observer(int fps=50) : fps(fps) {
+        InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Observer");
+        SetTargetFPS(fps);
+    }
+
+    void onStep(const State &s, int episode, int step) override {
+        if (!draw) return;
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+        drawTrack();
+        drawCartPole(s);
+        DrawText(TextFormat("episode %d   step %d", episode, step), 10, 10, 20, RAYWHITE);
+        EndDrawing();
+
+        if (WindowShouldClose()) {
+            draw = false;
+            CloseWindow();
+        }
+    }
+
+    ~Observer() {
+        if (draw) CloseWindow();
+    }
+};

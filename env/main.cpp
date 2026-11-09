@@ -4,9 +4,9 @@
 
 int main() {
     RandomStrategy s;
-    Evaluator e(1000, 42);
+    Observer o;
+    Evaluator e(1000, 42, &o);
     printReport(e.evaluate(s));
 
-    watch(s, 42, 10);
     return 0;
 }
