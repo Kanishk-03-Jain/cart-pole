@@ -39,7 +39,7 @@ class CartPole {
     // random start distribution for initial state, near upright so game is playable
     std::uniform_real_distribution<double> startDist{-0.05, 0.05};
 
-    public:
+public:
     CartPole(unsigned seed) {
         reset(seed);
     }

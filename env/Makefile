@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++20 -Wall -Wextra
 LDLIBS   = -lraylib
 
 SRCS = main.cpp
-HDRS = cartpole.h renderer.h
+HDRS = cartpole.h renderer.h strategy.h strategies/random_strategy.h evaluator.h
 
 .PHONY: build run clean
 
