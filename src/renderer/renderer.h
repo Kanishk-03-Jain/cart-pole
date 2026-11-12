@@ -65,23 +65,23 @@ inline void watch(Strategy &s, unsigned seed, int fps = 50) {
     CloseWindow();
 }
 
-class Observer : public EpisodeObserver {
+class WindowObserver : public EpisodeObserver {
     bool draw = true;
 
 public:
-    explicit Observer(int fps=50) {
+    explicit WindowObserver(int fps=50) {
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Observer");
         SetTargetFPS(fps);
     }
 
-    void onStep(const State &s, int episode, int step) override {
+    void onStep(const State &s, int episode, int step, const std::string &strategy) override {
         if (!draw) return;
 
         BeginDrawing();
         ClearBackground(BLACK);
         drawTrack();
         drawCartPole(s);
-        DrawText(TextFormat("episode %d   step %d", episode, step), 10, 10, 20, RAYWHITE);
+        DrawText(TextFormat("Strategy: %s\n\nEpisode: %d\nStep: %d  ", strategy.c_str(), episode, step), 10, 10, 20, RAYWHITE);
         EndDrawing();
 
         if (WindowShouldClose()) {
@@ -90,7 +90,7 @@ public:
         }
     }
 
-    ~Observer() {
+    ~WindowObserver() {
         if (draw) CloseWindow();
     }
 };

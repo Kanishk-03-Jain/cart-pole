@@ -26,6 +26,7 @@ public:
     Evaluator(int numEpisodes, unsigned envSeed, EpisodeObserver *obs = nullptr) : numEpisodes(numEpisodes), envSeed(envSeed), observer(obs) {}
 
     EvalReport evaluate(Strategy &strategy) const {
+        std::string strategyName = strategy.name();
         if (numEpisodes <= 0) {
             std::cerr << "No episodes to run\n";
             return {};
@@ -48,7 +49,7 @@ public:
                 r += result.reward;
                 step++;
 
-                if (observer) observer->onStep(state, episode, step);
+                if (observer) observer->onStep(state, episode, step, strategyName);
             } while (!result.terminated && !result.truncated);
 
             if (!result.terminated) success++;
@@ -59,7 +60,7 @@ public:
         }
 
         EvalReport report{};
-        report.strategy = strategy.name();
+        report.strategy = strategyName;
         report.episodes = numEpisodes;
         report.meanReturn = std::accumulate(returns.begin(), returns.end(), 0.0) / numEpisodes;
         std::sort(returns.begin(), returns.end());
