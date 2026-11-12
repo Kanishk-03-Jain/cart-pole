@@ -6,7 +6,6 @@ You write a **strategy** (a rule or agent that picks "push left" or "push right"
 
 ## Features
 
-- **Gym-compatible environment:** the same equations, Euler integration, start-state distribution, termination limits and 500-step limit as `CartPole-v1`.
 - **Pluggable strategies:** inherit from `Strategy` and implement `act()` and `name()`.
 - **Evaluator:** runs N seeded episodes and reports the mean, median, standard deviation, standard error, min, max and success rate.
 - **Watching:** an observer draws each step in a raylib window. If you close the window, the run continues without drawing.
