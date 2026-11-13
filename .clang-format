@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+AccessModifierOffset: -4
+ColumnLimit: 100
+
+# Go-style alignment: line up names, `=` and trailing comments across consecutive lines.
+# A blank line ends an aligned block, like gofmt.
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AlignFunctionDeclarations: false
+AlignConsecutiveAssignments: true
+AlignTrailingComments: true
