@@ -65,14 +65,16 @@ public:
         }
 
         EvalReport report{};
-        report.strategy   = strategyName;
-        report.episodes   = numEpisodes;
-        report.meanReturn = std::accumulate(returns.begin(), returns.end(), 0.0) / numEpisodes;
         std::sort(returns.begin(), returns.end());
+
+        report.strategy     = strategyName;
+        report.episodes     = numEpisodes;
+        report.meanReturn   = std::accumulate(returns.begin(), returns.end(), 0.0) / numEpisodes;
         report.medianReturn = returns[numEpisodes / 2];
         report.minReturn    = returns[0];
         report.maxReturn    = returns[numEpisodes - 1];
         report.stdReturn    = 0;
+        
         for (auto x : returns)
             report.stdReturn += (x - report.meanReturn) * (x - report.meanReturn);
         report.stdReturn   = std::sqrt(report.stdReturn / (numEpisodes - 1));
